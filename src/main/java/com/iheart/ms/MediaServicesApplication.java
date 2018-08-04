@@ -1,12 +1,12 @@
-package com.iheart.advertiser;
+package com.iheart.ms;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AdvertiserApplication {
+public class MediaServicesApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AdvertiserApplication.class, args);
+		SpringApplication.run(MediaServicesApplication.class, args);
 	}
 }
