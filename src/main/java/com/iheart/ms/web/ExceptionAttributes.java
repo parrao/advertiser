@@ -8,11 +8,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/**
+ * ExceptionbAttributes interface
+ *  @author Parthi
+ */
 public interface ExceptionAttributes {
 
     /**
      * Returns a {@link Map} of exception attributes. The Map may be used to
-     * display an error page or serialized into a {@link ResponseBody}.
+     * display an error page  into a {@link ResponseBody}.
      * 
      * @param exception The Exception reported.
      * @param httpRequest The HttpServletRequest in which the Exception

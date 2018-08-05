@@ -2,23 +2,23 @@ package com.iheart.ms.model;
 
 public class Advertiser {
 	
-	private int id;
-	private String contact_name;
-	private int  credit_limit;
+	private Integer id;
+	private String contactName;
+	private Integer  creditLimit;
 	
 	public Advertiser() {
 		
 	}
 
-	public Advertiser(int id,String contact_name,int credit_limit) {
+	public Advertiser(int id,String contactName,int creditLimit) {
 	
 		this.id=id;
-		this.contact_name=contact_name;
-		this.credit_limit=credit_limit;
+		this.contactName=contactName;
+		this.creditLimit=creditLimit;
 		
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
@@ -26,23 +26,30 @@ public class Advertiser {
 		this.id = id;
 	}
 
-	public String getContact_name() {
-		return contact_name;
+	public String getContactName() {
+		return contactName;
 	}
 
-	public void setContact_name(String contact_name) {
-		this.contact_name = contact_name;
+	public void setContact_name(String contactName) {
+		this.contactName = contactName;
 	}
 
-	public int getCredit_limit() {
-		return credit_limit;
+	public Integer getCreditLimit() {
+		return creditLimit;
 	}
 
-	public void setCredit_limit(int credit_limit) {
-		this.credit_limit = credit_limit;
+	public void setCreditLimit(int creditLimit) {
+		this.creditLimit = creditLimit;
 	}
 	
 	
-	
+	@Override
+	  public String toString() {
+	    return "Advertiser{" +
+	        "id=" + id +
+	        ", contactName='" + contactName + '\'' +
+	        ", creditLimit=" + creditLimit +
+	        '}';
+	  }
 	
 }
