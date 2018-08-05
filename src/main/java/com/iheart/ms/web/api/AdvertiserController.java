@@ -1,6 +1,6 @@
 package com.iheart.ms.web.api;
 
-import java.util.Arrays;
+
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.iheart.ms.model.Advertiser;
 import com.iheart.ms.service.AdvertiserService;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,18 +60,14 @@ import org.slf4j.LoggerFactory;
 
     
     /**
-     * Web service endpoint to fetch a single Advertiser entity by primary key
+     * The endpoint to fetch a single Advertiser entity by primary key
      * identifier.
-     * 
-     * If found, the Advertiser is returned as JSON with HTTP status 200.
-     * 
-     * If not found, the service returns an empty response body with HTTP status
+     * If found, the Advertiser is returned as JSON with HTTP status 200 else empty response body with HTTP status
      * 404.
      * 
-     * @param id A Int URL path variable containing the Advertiser primary key
+     * @param id A integer URL path variable containing the Advertiser primary key
      *        identifier.
-     * @return A ResponseEntity containing a single Advertiser object, if found,
-     *         and a HTTP status code as described in the method comment.
+     * @return A ResponseEntity containing a single Advertiser object
      */
 	
     @RequestMapping(
@@ -94,20 +89,15 @@ import org.slf4j.LoggerFactory;
 
     
     /**
-     * Web service endpoint to create a single Advertiser entity. The HTTP request
-     * body is expected to contain a Advertiser object in JSON format. The
-     * Advertiser is persisted in the data repository.
+     * The endpoint to create a single Advertiser entity. The HTTP request
+     * body is expected to contain a Advertiser object in JSON format.
      * 
      * If created successfully, the persisted Advertiser is returned as JSON with
-     * HTTP status 201.
-     * 
-     * If not created successfully, the service returns an empty response body
+     * HTTP status 201 else the service returns an empty response body
      * with HTTP status 500.
      * 
-     * @param greeting The Advertiser object to be created.
-     * @return A ResponseEntity containing a single Advertiser object, if created
-     *         successfully, and a HTTP status code as described in the method
-     *         comment.
+     * @param advertiser The Advertiser object to be created.
+     * @return A ResponseEntity containing a created Advertiser object
      */
     @RequestMapping(
             value = "/api/advertiser",
@@ -124,6 +114,62 @@ import org.slf4j.LoggerFactory;
         return new ResponseEntity<Advertiser>(savedAdvertiser, HttpStatus.CREATED);
     }
     
-    
+    /**
+     * The endpoint to update a single Advertiser entity. The HTTP request
+     * body is expected to contain a Advertiser object in JSON format. 
+     * 
+     * If updated successfully, the updated Advertiser is returned as JSON with
+     * HTTP status 200 else the service returns an empty response body and HTTP status
+     * 404.
+     * 
+     * If not updated successfully, the service returns an empty response body
+     * with HTTP status 500.
+     * 
+     * @param advertiser The Advertiser object to be updated.
+     * @return A ResponseEntity containing a updated Advertiser object.
+     */
+    @RequestMapping(
+            value = "/api/advertiser",
+            method = RequestMethod.PUT,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Advertiser> updateAdvertiser(
+            @RequestBody Advertiser advertiser) {
+        logger.info("> updateAdvertiser id:{}", advertiser.getId());
+
+        boolean result = advertiserService.update(advertiser);
+        if (result == false) {
+            return new ResponseEntity<Advertiser>(
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        logger.info("< updateAdvertiser id:{}", advertiser.getId());
+        return new ResponseEntity<Advertiser>(advertiser, HttpStatus.OK);
+    }
+
+    /**
+     * The endpoint to delete a  Advertiser entity. If deleted successfully, the service returns an empty response body with
+     * HTTP status 204 else the service returns with HTTP status 500.
+     * 
+     * @param id A Integer URL path variable containing the Advertiser primary key
+     *        identifier.
+     * @return A ResponseEntity with an empty response body and a HTTP status
+     *         code.
+     */
+    @RequestMapping(
+            value = "/api/advertiser/{id}",
+            method = RequestMethod.DELETE)
+    public ResponseEntity<Advertiser> deleteAdvertiser(
+            @PathVariable("id") int id) {
+        logger.info("> deleteAdvertiser id:{}", id);
+
+        boolean result= advertiserService.delete(id);
+        if(result==false) {
+        	 return new ResponseEntity<Advertiser>(
+                     HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        logger.info("< deleteAdvertiser id:{}", id);
+        return new ResponseEntity<Advertiser>(HttpStatus.NO_CONTENT);
+    }
 
 }

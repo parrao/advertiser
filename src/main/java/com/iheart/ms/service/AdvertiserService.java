@@ -34,13 +34,13 @@ public interface AdvertiserService {
      * @param advertiser A Advertiser object to be updated.
      * @return The updated Advertiser entity.
      */
-    Advertiser update(Advertiser advertiser);
+    boolean update(Advertiser advertiser);
 
     /**
      * Removes a previously persisted Advertiser entity from the data store.
      * @param id A Long primary key identifier.
      */
-    void delete(int id);
+     boolean delete(int id);
 
 
 

@@ -2,12 +2,14 @@ package com.iheart.ms.service;
 
 import java.util.Collection;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.iheart.ms.exceptions.EntityExistsException;
+import com.iheart.ms.exceptions.NoResultException;
 import com.iheart.ms.model.Advertiser;
 import com.iheart.ms.repository.AdvertiserRepository;
 
@@ -56,14 +58,42 @@ public class AdvertiserServiceImpl implements AdvertiserService {
 	}
 
 	@Override
-	public Advertiser update(Advertiser advertiser) {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean update(Advertiser advertiser) {
+		logger.info("> update id:{}", advertiser.getId());
+		
+		Advertiser advertiserToUpdate = findOne(advertiser.getId());
+        if (advertiserToUpdate == null) {
+            // Cannot update Advertiser that hasn't been persisted
+            logger.error(
+                    "Attempted to update a 	Advertiser, but the entity does not exist.");
+            throw new NoResultException("Requested entity not found.");
+        }
+
+        advertiserToUpdate.setContact_name(advertiser.getContactName());
+        advertiserToUpdate.setCreditLimit(advertiser.getCreditLimit());
+        int result = advertiserRepository.update(advertiserToUpdate);
+        if(result>0) {
+        logger.info("< update id:{}", advertiserToUpdate.getId());
+        return true;
+        }else {
+        	return false;
+        }
+        
 	}
 
 	@Override
-	public void delete(int id) {
-		// TODO Auto-generated method stub
+	public boolean delete(int id) {
+		
+		logger.info("> delete id:{}", id);
+
+		int result = advertiserRepository.deleteById(id);
+
+		if(result>0) {
+			  logger.info("< delete id:{}", id);
+			  return true;
+	     }else {
+	        	return false;
+	     }
 
 	}
 
