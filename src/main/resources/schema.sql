@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS advertiser  (
-  id INT NOT NULL AUTO_INCREMENT  PRIMARY KEY
+  id BIGINT NOT NULL AUTO_INCREMENT  PRIMARY KEY
   ,contact_name VARCHAR(255) NOT NULL
-  ,credit_limit INT
+  ,credit_limit BIGINT
 );

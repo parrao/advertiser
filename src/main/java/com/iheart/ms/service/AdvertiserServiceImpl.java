@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.iheart.ms.exceptions.EntityExistsException;
 import com.iheart.ms.exceptions.NoResultException;
@@ -14,6 +16,9 @@ import com.iheart.ms.model.Advertiser;
 import com.iheart.ms.repository.AdvertiserRepository;
 
 @Service
+@Transactional(
+        propagation = Propagation.SUPPORTS,
+        readOnly = true)
 public class AdvertiserServiceImpl implements AdvertiserService {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -32,13 +37,16 @@ public class AdvertiserServiceImpl implements AdvertiserService {
 	}
 
 	@Override
-	public Advertiser findOne(int id) {
+	public Advertiser findOne(Long id) {
 		
 		Advertiser adv=advertiserRepository.findById(id);
 		return adv;
 	}
 
 	@Override
+	@Transactional(
+            propagation = Propagation.REQUIRED,
+            readOnly = false)
 	public Advertiser create(Advertiser advertiser) {
 
 
@@ -58,7 +66,10 @@ public class AdvertiserServiceImpl implements AdvertiserService {
 	}
 
 	@Override
-	public boolean update(Advertiser advertiser) {
+	@Transactional(
+            propagation = Propagation.REQUIRED,
+            readOnly = false)
+	public void update(Advertiser advertiser) {
 		logger.info("> update id:{}", advertiser.getId());
 		
 		Advertiser advertiserToUpdate = findOne(advertiser.getId());
@@ -66,34 +77,38 @@ public class AdvertiserServiceImpl implements AdvertiserService {
             // Cannot update Advertiser that hasn't been persisted
             logger.error(
                     "Attempted to update a 	Advertiser, but the entity does not exist.");
-            throw new NoResultException("Requested entity not found.");
+            throw new NoResultException("Requested for update - Advertiser not found.");
         }
 
-        advertiserToUpdate.setContact_name(advertiser.getContactName());
+        advertiserToUpdate.setContactName(advertiser.getContactName());
         advertiserToUpdate.setCreditLimit(advertiser.getCreditLimit());
         int result = advertiserRepository.update(advertiserToUpdate);
-        if(result>0) {
-        logger.info("< update id:{}", advertiserToUpdate.getId());
-        return true;
-        }else {
-        	return false;
-        }
+      
+         logger.info("< update id:{}", advertiserToUpdate.getId());
+
+      
         
 	}
 
 	@Override
-	public boolean delete(int id) {
+	@Transactional(
+            propagation = Propagation.REQUIRED,
+            readOnly = false)
+	public void delete(Long id) {
 		
 		logger.info("> delete id:{}", id);
-
+		
+		Advertiser advertiserToDelete = findOne(id);
+        if (advertiserToDelete == null) {
+            // Cannot update Advertiser that hasn't been persisted
+            logger.error(
+                    "Attempted to delete a 	Advertiser, but the record does not exist.");
+            throw new NoResultException("Requested for delete - Advertiser not found.");
+        }
 		int result = advertiserRepository.deleteById(id);
 
-		if(result>0) {
 			  logger.info("< delete id:{}", id);
-			  return true;
-	     }else {
-	        	return false;
-	     }
+		
 
 	}
 

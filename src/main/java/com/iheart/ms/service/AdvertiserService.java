@@ -20,11 +20,11 @@ public interface AdvertiserService {
      * @param id A Long primary key identifier.
      * @return A Advertiser or <code>null</code> if none found.
      */
-    Advertiser findOne(int id);
+    Advertiser findOne(Long id);
 
     /**
      * Persists a Advertiser entity in the data store.
-     * @param greeting A Advertiser object to be persisted.
+     * @param advertiser A Advertiser object to be persisted.
      * @return The persisted Advertiser entity.
      */
     Advertiser create(Advertiser advertiser);
@@ -34,13 +34,13 @@ public interface AdvertiserService {
      * @param advertiser A Advertiser object to be updated.
      * @return The updated Advertiser entity.
      */
-    boolean update(Advertiser advertiser);
+    void update(Advertiser advertiser);
 
     /**
      * Removes a previously persisted Advertiser entity from the data store.
      * @param id A Long primary key identifier.
      */
-     boolean delete(int id);
+     void delete(Long id);
 
 
 

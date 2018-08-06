@@ -21,10 +21,10 @@ public interface AdvertiserRepository {
 		public Collection<Advertiser> findAll();
 
 		@Select("SELECT * FROM advertiser WHERE id = #{id}")
-		public Advertiser findById(int id);
+		public Advertiser findById(Long id);
 
 		@Delete("DELETE FROM advertiser WHERE id = #{id}")
-		public int deleteById(int id);
+		public int deleteById(Long id);
 
 		@Options(useGeneratedKeys=true,keyProperty="id",  keyColumn="id")
 		@Insert("INSERT INTO advertiser(contact_name, credit_limit) VALUES (#{contactName}, #{creditLimit})")

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iheart.ms.model.Advertiser;
 import com.iheart.ms.service.AdvertiserService;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
 	 *  @author Parthi
 	 */
 	@RestController
-	public class AdvertiserController {
+	public class AdvertiserController extends BaseController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 		
 	 /**
@@ -74,7 +75,7 @@ import org.slf4j.LoggerFactory;
             value = "/api/advertiser/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Advertiser> getAdvertiser(@PathVariable("id") int id) {
+    public ResponseEntity<Advertiser> getAdvertiser(@PathVariable("id") Long id) {
         logger.info("> getAdvertiser id:{}", id);
 
         Advertiser advertiser = advertiserService.findOne(id);
@@ -129,7 +130,7 @@ import org.slf4j.LoggerFactory;
      * @return A ResponseEntity containing a updated Advertiser object.
      */
     @RequestMapping(
-            value = "/api/advertiser",
+            value = "/api/advertiser/{id}",
             method = RequestMethod.PUT,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -137,11 +138,7 @@ import org.slf4j.LoggerFactory;
             @RequestBody Advertiser advertiser) {
         logger.info("> updateAdvertiser id:{}", advertiser.getId());
 
-        boolean result = advertiserService.update(advertiser);
-        if (result == false) {
-            return new ResponseEntity<Advertiser>(
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+         advertiserService.update(advertiser);
 
         logger.info("< updateAdvertiser id:{}", advertiser.getId());
         return new ResponseEntity<Advertiser>(advertiser, HttpStatus.OK);
@@ -160,14 +157,10 @@ import org.slf4j.LoggerFactory;
             value = "/api/advertiser/{id}",
             method = RequestMethod.DELETE)
     public ResponseEntity<Advertiser> deleteAdvertiser(
-            @PathVariable("id") int id) {
+            @PathVariable("id") Long id) {
         logger.info("> deleteAdvertiser id:{}", id);
 
-        boolean result= advertiserService.delete(id);
-        if(result==false) {
-        	 return new ResponseEntity<Advertiser>(
-                     HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+         advertiserService.delete(id);
         logger.info("< deleteAdvertiser id:{}", id);
         return new ResponseEntity<Advertiser>(HttpStatus.NO_CONTENT);
     }

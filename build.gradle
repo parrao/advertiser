@@ -14,6 +14,8 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'jacoco'
+
 
 group = 'com.iheart'
 version = '0.0.1-SNAPSHOT'
@@ -35,3 +37,14 @@ dependencies {
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
+
+jacoco {
+  toolVersion = '0.7.5.201505241946'
+}
+
+jacocoTestReport {
+  reports {
+    html.enabled = true
+    }
+  }
+  test.finalizedBy jacocoTestReport
