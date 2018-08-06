@@ -104,6 +104,56 @@ public class AdvertiserServiceTest extends AbstractMediaServicesApplicationTests
 	    }
 	    
 	    
+	    @Test
+	    public void validateCreditTest() {
+
+	        Long id = new Long(1);
+	        Long transAmt = new Long(5000);
+
+	        Advertiser adEntity = adService.findOne(id);
+
+	        Assert.assertNotNull("failure - expected not null", adEntity);
+
+	        boolean isValid=adService.validateCredit(id, transAmt);
+	        Assert.assertTrue("failure - expected true",isValid);
+
+	    }
+	    
+	    @Test
+	    public void inValidateCreditTest() {
+
+	        Long id = new Long(1);
+	        Long transAmt = new Long(15000);
+
+	        Advertiser adEntity = adService.findOne(id);
+
+	        Assert.assertNotNull("failure - expected not null", adEntity);
+
+	        boolean isValid=adService.validateCredit(id, transAmt);
+	        Assert.assertFalse("failure - expected false",isValid);
+
+	    }
+	    
+	    @Test
+	    public void validateCreditNonExitsAdTest() {
+	    	Exception exception = null;
+	        Long id = new Long(Long.MAX_VALUE);
+	        Long transAmt = new Long(5000);
+
+	         
+	        
+	        try {
+	        	adService.validateCredit(id, transAmt);
+	        } catch (NoResultException e) {
+	            exception = e;
+	        }
+
+	        Assert.assertNotNull("failure - expected exception", exception);
+	        Assert.assertTrue("failure - expected NoResultException",exception instanceof NoResultException);
+	        
+
+	    }
+	    
 	    
 	    @Test
 	    public void updateTest() {
@@ -166,14 +216,13 @@ public class AdvertiserServiceTest extends AbstractMediaServicesApplicationTests
 
 	        adService.delete(id);
 
-	       // Collection<Advertiser> list = adService.findAll();
-
-	       // Assert.assertEquals("failure - expected size", 2, list.size());
 
 	        Advertiser deletedEntity = adService.findOne(id);
 
 	        Assert.assertNull("failure - expected null", deletedEntity);
 
 	    }
+	    
+	   
 
 }

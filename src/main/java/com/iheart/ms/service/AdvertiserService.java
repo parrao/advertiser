@@ -42,6 +42,13 @@ public interface AdvertiserService {
      */
      void delete(Long id);
 
+     
+     /**
+      *  Validate if the advertiser has enough credit to perform a transaction.
+      *  @param id A Long primary key identifier.
+      * @param transAmount A Long transaction Amount.
+      */
+      boolean validateCredit(Long id,Long transAmount);
 
 
 }

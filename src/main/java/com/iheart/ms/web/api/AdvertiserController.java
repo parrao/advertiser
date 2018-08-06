@@ -2,6 +2,8 @@ package com.iheart.ms.web.api;
 
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iheart.ms.model.Advertiser;
 import com.iheart.ms.service.AdvertiserService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +31,7 @@ import org.slf4j.LoggerFactory;
 	 * Advertiser Controller class for Advertiser services endpoints
 	 *  @author Parthi
 	 */
+	@Api(value="Advertiser Web Service Endpoint", description="Operations pertaining to Advertiser in iHeart Media Services")
 	@RestController
 	public class AdvertiserController extends BaseController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -45,6 +52,12 @@ import org.slf4j.LoggerFactory;
      * 
      * @return A ResponseEntity containing a Collection of Advertiser objects.
      */
+    @ApiOperation(value = "View a list of available Advertiser",response = Iterable.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved list"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
+    }
+    )
     @RequestMapping(
             value = "/api/advertisers",
             method = RequestMethod.GET,
@@ -70,7 +83,12 @@ import org.slf4j.LoggerFactory;
      *        identifier.
      * @return A ResponseEntity containing a single Advertiser object
      */
-	
+    @ApiOperation(value = "Search for a particular Advertiser by Id",response = Advertiser.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved Advertiser info"),
+            @ApiResponse(code = 404, message = "The Advertiser you were trying to reach is not found")
+    }
+    )
     @RequestMapping(
             value = "/api/advertiser/{id}",
             method = RequestMethod.GET,
@@ -100,6 +118,12 @@ import org.slf4j.LoggerFactory;
      * @param advertiser The Advertiser object to be created.
      * @return A ResponseEntity containing a created Advertiser object
      */
+    @ApiOperation(value = "Create New Advertiser",response = Advertiser.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Created Advertiser Resources"),
+            @ApiResponse(code = 500, message = "The id attribute must be null to persist a new record.")
+    }
+    )
     @RequestMapping(
             value = "/api/advertiser",
             method = RequestMethod.POST,
@@ -129,6 +153,12 @@ import org.slf4j.LoggerFactory;
      * @param advertiser The Advertiser object to be updated.
      * @return A ResponseEntity containing a updated Advertiser object.
      */
+    @ApiOperation(value = "Update Advertiser",response = Advertiser.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully update Advertiser resource and retrive the updated Advertiser info"),
+            @ApiResponse(code = 404, message = "The Advertiser you were trying to update is not found")
+    }
+    )
     @RequestMapping(
             value = "/api/advertiser/{id}",
             method = RequestMethod.PUT,
@@ -153,6 +183,12 @@ import org.slf4j.LoggerFactory;
      * @return A ResponseEntity with an empty response body and a HTTP status
      *         code.
      */
+    @ApiOperation(value = "Delete Advertiser",response = Advertiser.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully delete Advertiser resource"),
+            @ApiResponse(code = 404, message = "The Advertiser you were trying to delete is not found")
+    }
+    )
     @RequestMapping(
             value = "/api/advertiser/{id}",
             method = RequestMethod.DELETE)
@@ -165,4 +201,39 @@ import org.slf4j.LoggerFactory;
         return new ResponseEntity<Advertiser>(HttpStatus.NO_CONTENT);
     }
 
+    
+    
+    /**
+     * The endpoint to validate the Advertiser credit. The service returns an validCredit true/false response body with
+     * HTTP status 200 else the service returns with HTTP status 500.
+     * 
+     * @param id A Long URL path variable containing the Advertiser primary key
+     *        identifier.
+     * @param id A Long URL path variable containing the Transaction Amount to validate.
+     * @return A ResponseEntity with a enoughCredit true/false response body and a HTTP status
+     *         code.
+     */
+    @ApiOperation(value = "Validate Advertiser Credit",response = Advertiser.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully validated Advertiser credit"),
+            @ApiResponse(code = 404, message = "The Advertiser you were trying to delete is not found")
+    }
+    )
+    @RequestMapping(
+            value = "/api/advertiser/{id}/{transAmount}",
+            method = RequestMethod.GET)
+    public ResponseEntity<Map> validateAdvertiserCredit(
+            @PathVariable("id") Long id,@PathVariable("transAmount") Long transAmount) {
+    	Map<String,Boolean> response=new HashMap<String,Boolean>();
+        
+        logger.info("> validateAdvertiserCredit id:{}", id);
+
+         
+         response.put("ValidCredit", advertiserService.validateCredit(id, transAmount));
+        return new ResponseEntity<Map>(response,HttpStatus.OK);
+    }
+    
+    
+    
+    
 }

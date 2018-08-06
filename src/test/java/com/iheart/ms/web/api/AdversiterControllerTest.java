@@ -1,5 +1,8 @@
 package com.iheart.ms.web.api;
 
+import java.util.Map;
+
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +18,8 @@ import com.iheart.ms.AbstractMediaServicesControllerTest;
 import com.iheart.ms.exceptions.NoResultException;
 import com.iheart.ms.model.Advertiser;
 import com.iheart.ms.service.AdvertiserService;
+
+
 
 
 @Transactional
@@ -180,9 +185,6 @@ public class AdversiterControllerTest extends AbstractMediaServicesControllerTes
 	        	logger.info("Exception is updateNonExitsAdvertiserTest................................");
 	            exception = e;
 	        }
-	        logger.info("Result :"+result);
-	      //  Assert.assertNotNull("failure - expected exception", exception);
-	      //  Assert.assertTrue("failure - expected NoResultException",exception instanceof NoResultException);
 	        int status = result.getResponse().getStatus();
 
 	        Assert.assertEquals("failure - expected HTTP status 500", 404, status);
@@ -230,6 +232,28 @@ public class AdversiterControllerTest extends AbstractMediaServicesControllerTes
 	        int status = result.getResponse().getStatus();
 
 	        Assert.assertEquals("failure - expected HTTP status 404", 404, status);
+
+	    }
+	    
+	    
+	    @Test
+	    public void validateAdvertiserCreditTest() throws Exception {
+
+	        String uri = "/api/advertiser/{id}/{transAmount}";
+	        Long id = new Long(1);
+	        Long transAmt = new Long(5000);
+
+	        MvcResult result = mvc.perform(MockMvcRequestBuilders.get(uri, id,transAmt)
+	                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+	        String content = result.getResponse().getContentAsString();
+	        int status = result.getResponse().getStatus();
+
+	         JSONObject respJObj=new JSONObject(content);
+	         
+           
+	        Assert.assertEquals("failure - expected HTTP status 200", 200, status);
+	        Assert.assertTrue("failure - expected HTTP response with ValidCredit true",Boolean.valueOf(respJObj.getString("ValidCredit")));
 
 	    }
 

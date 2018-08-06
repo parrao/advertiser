@@ -96,7 +96,7 @@ public class AdvertiserServiceImpl implements AdvertiserService {
             readOnly = false)
 	public void delete(Long id) {
 		
-		logger.info("> delete id:{}", id);
+		logger.info("delete id:{}", id);
 		
 		Advertiser advertiserToDelete = findOne(id);
         if (advertiserToDelete == null) {
@@ -106,10 +106,36 @@ public class AdvertiserServiceImpl implements AdvertiserService {
             throw new NoResultException("Requested for delete - Advertiser not found.");
         }
 		int result = advertiserRepository.deleteById(id);
-
-			  logger.info("< delete id:{}", id);
 		
 
 	}
 
+	@Override
+	@Transactional(
+            propagation = Propagation.REQUIRED,
+            readOnly = true)
+	public boolean validateCredit(Long id,Long transAmount) {
+		
+		logger.info("Validate Advertiser credit - id:{}", id);
+		
+		Advertiser advertiserToValidate = findOne(id);
+        if (advertiserToValidate == null) {
+            
+            logger.error(
+                    "Attempted to validate  a Advertiser credit, but the record does not exist.");
+            throw new NoResultException("Requested for Credit validation - Advertiser not found.");
+        }
+		
+        Long creditLimit=advertiserToValidate.getCreditLimit()-transAmount;
+        if(creditLimit>0) {
+        	return true;
+        }else {
+        	return false;
+        }
+        
+		
+	}
+
+	
+	
 }
