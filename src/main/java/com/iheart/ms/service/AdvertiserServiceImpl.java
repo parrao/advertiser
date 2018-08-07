@@ -48,15 +48,12 @@ public class AdvertiserServiceImpl implements AdvertiserService {
             propagation = Propagation.REQUIRED,
             readOnly = false)
 	public Advertiser create(Advertiser advertiser) {
-
-
         // Ensure the advertiser object to be created does NOT exist in the
         // Database. 
         if (advertiser.getId() != null) {
             // Cannot create advertiser with specified ID value
             logger.error("Attempted to create a advertiser, but id attribute was not null.");
-            throw new EntityExistsException(
-                    "The id attribute must be null to persist a new record.");
+            throw new EntityExistsException("The id attribute must be null to persist a new record.");
         }
 
         advertiserRepository.insert(advertiser);
