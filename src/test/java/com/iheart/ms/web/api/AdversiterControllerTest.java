@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.iheart.ms.AbstractMediaServicesControllerTest;
+import com.iheart.ms.exceptions.EntityExistsException;
 import com.iheart.ms.exceptions.NoResultException;
 import com.iheart.ms.model.Advertiser;
 import com.iheart.ms.service.AdvertiserService;
@@ -121,6 +122,36 @@ public class AdversiterControllerTest extends AbstractMediaServicesControllerTes
 	        Assert.assertEquals("failure - expected adversiter.CreditLimit match", Long.valueOf("10000"),createdAdvertiser.getCreditLimit());
 
 	    }
+	    
+	    @Test
+	    public void createAdvertiserWithIdTest() throws Exception {
+	    	Exception exception = null;
+	        String uri = "/api/advertiser";
+	        Advertiser adEntity = new Advertiser();
+	        adEntity.setId(1L);
+	        adEntity.setContactName("CTestAd");
+	    	adEntity.setCreditLimit(10000L);
+	    	
+	        String inputJson = super.mapToJson(adEntity);
+	        MvcResult result =null;
+	        try {
+	        	result = mvc
+	                .perform(MockMvcRequestBuilders.post(uri)
+	                        .contentType(MediaType.APPLICATION_JSON)
+	                        .accept(MediaType.APPLICATION_JSON).content(inputJson))
+	                .andReturn();
+	    } catch (EntityExistsException e) {
+        	logger.info("Exception is updateNonExitsAdvertiserTest................................");
+            exception = e;
+        }
+	      
+	        int status = result.getResponse().getStatus();
+
+	        Assert.assertEquals("failure - expected HTTP status 500", 500, status);
+	       
+
+	    }
+	    
 	    
 	    @Test
 	    public void updateAdvertiserTest() throws Exception {
@@ -255,6 +286,48 @@ public class AdversiterControllerTest extends AbstractMediaServicesControllerTes
 	        Assert.assertEquals("failure - expected HTTP status 200", 200, status);
 	        Assert.assertTrue("failure - expected HTTP response with ValidCredit true",Boolean.valueOf(respJObj.getString("ValidCredit")));
 
+	    }
+	    
+	    @Test
+	    public void validateNonExitsAdvertiserTest() throws Exception {
+
+	        String uri = "/api/advertiser/{id}/{transAmount}";
+	        Long id = new Long(Long.MAX_VALUE);
+	        Long transAmt = new Long(5000);
+
+	        MvcResult result = mvc.perform(MockMvcRequestBuilders.get(uri, id,transAmt)
+	                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+	        String content = result.getResponse().getContentAsString();
+	        int status = result.getResponse().getStatus();
+
+	         JSONObject respJObj=new JSONObject(content);
+	         
+           
+	        Assert.assertEquals("failure - expected HTTP status 404", 404, status);
+	       
+	    }
+
+	    @Test
+	    public void inValidAdvertiserCreditTest() throws Exception {
+
+	        String uri = "/api/advertiser/{id}/{transAmount}";
+	        Long id = new Long(1);
+	        Long transAmt = new Long(15000);
+
+	        MvcResult result = mvc.perform(MockMvcRequestBuilders.get(uri, id,transAmt)
+	                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+	        String content = result.getResponse().getContentAsString();
+	        int status = result.getResponse().getStatus();
+
+	         JSONObject respJObj=new JSONObject(content);
+	         
+           
+	        Assert.assertEquals("failure - expected HTTP status 200", 200, status);
+	        Assert.assertFalse("failure - expected HTTP response with ValidCredit false",Boolean.valueOf(respJObj.getString("ValidCredit")));
+
+	       
 	    }
 
 	    
