@@ -1,5 +1,6 @@
 package com.iheart.ms.web.api;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import org.json.JSONObject;
@@ -96,7 +97,7 @@ public class AdversiterControllerTest extends AbstractMediaServicesControllerTes
 	        String uri = "/api/advertiser";
 	        Advertiser adEntity = new Advertiser();
 	        adEntity.setContactName("CTestAd");
-	    	adEntity.setCreditLimit(10000L);
+	    	adEntity.setCreditLimit(new BigDecimal(10000.00));
 	    	
 	        String inputJson = super.mapToJson(adEntity);
 
@@ -119,7 +120,7 @@ public class AdversiterControllerTest extends AbstractMediaServicesControllerTes
 	        Assert.assertNotNull("failure - expected adversiter not null",createdAdvertiser);
 	        Assert.assertNotNull("failure - expected adversiter.id not null",createdAdvertiser.getId());
 	        Assert.assertEquals("failure - expected adversiter.ContactName match", "CTestAd",createdAdvertiser.getContactName());
-	        Assert.assertEquals("failure - expected adversiter.CreditLimit match", Long.valueOf("10000"),createdAdvertiser.getCreditLimit());
+	        Assert.assertEquals("failure - expected adversiter.CreditLimit match", new BigDecimal(10000.00),createdAdvertiser.getCreditLimit());
 
 	    }
 	    
@@ -130,7 +131,7 @@ public class AdversiterControllerTest extends AbstractMediaServicesControllerTes
 	        Advertiser adEntity = new Advertiser();
 	        adEntity.setId(1L);
 	        adEntity.setContactName("CTestAd");
-	    	adEntity.setCreditLimit(10000L);
+	    	adEntity.setCreditLimit(new BigDecimal(10000.00));
 	    	
 	        String inputJson = super.mapToJson(adEntity);
 	        MvcResult result =null;
@@ -163,7 +164,7 @@ public class AdversiterControllerTest extends AbstractMediaServicesControllerTes
 	        String nameChange = adEntity.getContactName() + "-CTest";
 	        adEntity.setContactName(nameChange);
 	        
-	        Long updatedCredit = adEntity.getCreditLimit() + 5000L;
+	        BigDecimal updatedCredit = adEntity.getCreditLimit().add(new BigDecimal(5000.00));
 	        adEntity.setCreditLimit(updatedCredit);
 	        
 	        String inputJson = super.mapToJson(adEntity);
@@ -200,7 +201,7 @@ public class AdversiterControllerTest extends AbstractMediaServicesControllerTes
 	    	 Exception exception = null;
 	        String uri = "/api/advertiser/{id}";
 	        Long id = new Long(Long.MAX_VALUE);
-	        Advertiser adEntity = new Advertiser(Long.MAX_VALUE,"Janu",1000L);
+	        Advertiser adEntity = new Advertiser(Long.MAX_VALUE,"Janu",new BigDecimal(1000.00));
 	        
 	        
 	        String inputJson = super.mapToJson(adEntity);
@@ -270,11 +271,11 @@ public class AdversiterControllerTest extends AbstractMediaServicesControllerTes
 	    @Test
 	    public void validateAdvertiserCreditTest() throws Exception {
 
-	        String uri = "/api/advertiser/{id}/{transAmount}";
+	        String uri = "/api/advertiser/{id}/validatecredit";
 	        Long id = new Long(1);
-	        Long transAmt = new Long(5000);
+	        BigDecimal transAmt = new BigDecimal(5000.00);
 
-	        MvcResult result = mvc.perform(MockMvcRequestBuilders.get(uri, id,transAmt)
+	        MvcResult result = mvc.perform(MockMvcRequestBuilders.get(uri, id).param("transamount", transAmt.toString())
 	                .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
 	        String content = result.getResponse().getContentAsString();
@@ -284,25 +285,22 @@ public class AdversiterControllerTest extends AbstractMediaServicesControllerTes
 	         
            
 	        Assert.assertEquals("failure - expected HTTP status 200", 200, status);
-	        Assert.assertTrue("failure - expected HTTP response with ValidCredit true",Boolean.valueOf(respJObj.getString("ValidCredit")));
+	        Assert.assertTrue("failure - expected HTTP response with ValidCredit true",Boolean.valueOf(respJObj.getString("validCredit")));
 
 	    }
 	    
 	    @Test
 	    public void validateNonExitsAdvertiserTest() throws Exception {
 
-	        String uri = "/api/advertiser/{id}/{transAmount}";
+	        String uri = "/api/advertiser/{id}/validatecredit";
 	        Long id = new Long(Long.MAX_VALUE);
-	        Long transAmt = new Long(5000);
+	        BigDecimal transAmt = new BigDecimal(5000.00);
 
-	        MvcResult result = mvc.perform(MockMvcRequestBuilders.get(uri, id,transAmt)
+	        MvcResult result = mvc.perform(MockMvcRequestBuilders.get(uri, id).param("transamount", transAmt.toString())
 	                .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
 	        String content = result.getResponse().getContentAsString();
 	        int status = result.getResponse().getStatus();
-
-	         JSONObject respJObj=new JSONObject(content);
-	         
            
 	        Assert.assertEquals("failure - expected HTTP status 404", 404, status);
 	       
@@ -311,11 +309,11 @@ public class AdversiterControllerTest extends AbstractMediaServicesControllerTes
 	    @Test
 	    public void inValidAdvertiserCreditTest() throws Exception {
 
-	        String uri = "/api/advertiser/{id}/{transAmount}";
+	        String uri = "/api/advertiser/{id}/validatecredit";
 	        Long id = new Long(1);
-	        Long transAmt = new Long(15000);
+	        BigDecimal transAmt = new BigDecimal(15000.00);
 
-	        MvcResult result = mvc.perform(MockMvcRequestBuilders.get(uri, id,transAmt)
+	        MvcResult result = mvc.perform(MockMvcRequestBuilders.get(uri, id).param("transamount", transAmt.toString())
 	                .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
 	        String content = result.getResponse().getContentAsString();
@@ -325,10 +323,88 @@ public class AdversiterControllerTest extends AbstractMediaServicesControllerTes
 	         
            
 	        Assert.assertEquals("failure - expected HTTP status 200", 200, status);
-	        Assert.assertFalse("failure - expected HTTP response with ValidCredit false",Boolean.valueOf(respJObj.getString("ValidCredit")));
+	        Assert.assertFalse("failure - expected HTTP response with ValidCredit false",Boolean.valueOf(respJObj.getString("validCredit")));
 
 	       
 	    }
 
+	    
+	    @Test
+	    public void advertiserDeductCreditTest() throws Exception {
+
+	        String uri = "/api/advertiser/{id}/deductcredit";
+	        Long id = new Long(1);
+	        BigDecimal amount = new BigDecimal(1000.00);
+
+	        MvcResult result = mvc.perform(MockMvcRequestBuilders.post(uri, id).param("amount", amount.toString())
+	                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+	        String content = result.getResponse().getContentAsString();
+	        int status = result.getResponse().getStatus();
+
+	         JSONObject respJObj=new JSONObject(content);
+	         
+           
+	        Assert.assertEquals("failure - expected HTTP status 200", 200, status);
+	       
+	    }
+	    
+	    @Test
+	    public void advertiserDeductCreditFullTest() throws Exception {
+
+	        String uri = "/api/advertiser/{id}/deductcredit";
+	        Long id = new Long(1);
+	        BigDecimal amount = new BigDecimal(10000.00);
+
+	        MvcResult result = mvc.perform(MockMvcRequestBuilders.post(uri, id).param("amount", amount.toString())
+	                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+	        String content = result.getResponse().getContentAsString();
+	        int status = result.getResponse().getStatus();
+
+	         JSONObject respJObj=new JSONObject(content);
+	         
+           
+	        Assert.assertEquals("failure - expected HTTP status 200", 200, status);
+	       
+	    }
+	    
+	    @Test
+	    public void advertiserDeductOverCreditTest() throws Exception {
+
+	        String uri = "/api/advertiser/{id}/deductcredit";
+	        Long id = new Long(1);
+	        BigDecimal amount = new BigDecimal(15000.00);
+
+	        MvcResult result = mvc.perform(MockMvcRequestBuilders.post(uri, id).param("amount", amount.toString())
+	                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+	        String content = result.getResponse().getContentAsString();
+	        int status = result.getResponse().getStatus();
+
+	         JSONObject respJObj=new JSONObject(content);
+	         
+           
+	        Assert.assertEquals("failure - expected HTTP status 200", 200, status);
+	       
+	    }
+	    
+	    @Test
+	    public void deductNonExitsAdvertiserTest() throws Exception {
+
+	        String uri = "/api/advertiser/{id}/deductcredit";
+	        Long id = new Long(Long.MAX_VALUE);
+	        BigDecimal amount = new BigDecimal(5000.00);
+
+	        MvcResult result = mvc.perform(MockMvcRequestBuilders.post(uri, id).param("amount", amount.toString())
+	                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+	        String content = result.getResponse().getContentAsString();
+	        int status = result.getResponse().getStatus();
+
+           
+	        Assert.assertEquals("failure - expected HTTP status 404", 404, status);
+	       
+	    }
 	    
 }

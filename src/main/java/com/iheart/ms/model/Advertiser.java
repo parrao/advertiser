@@ -1,5 +1,7 @@
 package com.iheart.ms.model;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -13,7 +15,7 @@ public class Advertiser {
 	
 	private Long id;
 	private String contactName;
-	private Long  creditLimit;
+	private BigDecimal  creditLimit;
 	
 	
 }

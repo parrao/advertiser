@@ -1,5 +1,6 @@
 package com.iheart.ms.service;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
 import com.iheart.ms.model.Advertiser;
@@ -48,7 +49,15 @@ public interface AdvertiserService {
       *  @param id A Long primary key identifier.
       * @param transAmount A Long transaction Amount.
       */
-      boolean validateCredit(Long id,Long transAmount);
+      boolean validateCredit(Long id,BigDecimal transAmount);
+      
+      
+      /**
+       *  Deduct amount from  Advertiser credit.
+       *  @param id A Long primary key identifier.
+       * @param amount A BigDecimal  Amount.
+       */
+      Advertiser deductCredit(Long id,BigDecimal amount);
 
 
 }

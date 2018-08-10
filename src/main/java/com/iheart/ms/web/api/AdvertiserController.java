@@ -1,6 +1,7 @@
 package com.iheart.ms.web.api;
 
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iheart.ms.model.Advertiser;
@@ -220,19 +222,52 @@ import org.slf4j.LoggerFactory;
     }
     )
     @RequestMapping(
-            value = "/api/advertiser/{id}/{transAmount}",
+            value = "/api/advertiser/{id}/validatecredit",
             method = RequestMethod.GET)
     public ResponseEntity<Map> validateAdvertiserCredit(
-            @PathVariable("id") Long id,@PathVariable("transAmount") Long transAmount) {
+            @PathVariable("id") Long id,@RequestParam("transamount") BigDecimal transAmount) {
     	Map<String,Boolean> response=new HashMap<String,Boolean>();
         
         logger.info("> validateAdvertiserCredit id:{}", id);
 
          
-         response.put("ValidCredit", advertiserService.validateCredit(id, transAmount));
+         response.put("validCredit", advertiserService.validateCredit(id, transAmount));
         return new ResponseEntity<Map>(response,HttpStatus.OK);
     }
     
+    
+    /**
+     * The endpoint to deduct amount from  Advertiser credit. The HTTP request
+     * body is expected to contain a Advertiser object in JSON format.
+     * 
+     * If the amount is deducted successfully, the Advertiser info with updated credit limit is returned  as JSON with
+     * HTTP status 200 else the service returns an empty response body
+     * with HTTP status 500.
+     * 
+     * @param advertiser The Advertiser object to be created.
+     * @return A ResponseEntity containing a created Advertiser object
+     */
+    @ApiOperation(value = "Deduct amount from  Advertiser credit",response = Advertiser.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "updated Advertiser response"),
+            @ApiResponse(code = 500, message = "server error.")
+    }
+    )
+    @RequestMapping(
+            value = "/api/advertiser/{id}/deductcredit",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Advertiser> deductCredit(
+    		@PathVariable("id") Long id, @RequestParam(name="amount", required=true) BigDecimal deductAmount) {
+        logger.info("> deductCredit");
+
+        Advertiser updatedAdvertiser = advertiserService.deductCredit(id, deductAmount);
+        
+        logger.info("< deductCredit");
+        return new ResponseEntity<Advertiser>(updatedAdvertiser, HttpStatus.OK);
+    }
+    
+   
     
     
     

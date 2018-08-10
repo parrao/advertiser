@@ -1,5 +1,6 @@
 package com.iheart.ms.service;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
 
@@ -111,7 +112,7 @@ public class AdvertiserServiceImpl implements AdvertiserService {
 	@Transactional(
             propagation = Propagation.REQUIRED,
             readOnly = true)
-	public boolean validateCredit(Long id,Long transAmount) {
+	public boolean validateCredit(Long id,BigDecimal transAmount) {
 		
 		logger.info("Validate Advertiser credit - id:{}", id);
 		
@@ -123,8 +124,9 @@ public class AdvertiserServiceImpl implements AdvertiserService {
             throw new NoResultException("Requested for Credit validation - Advertiser not found.");
         }
 		
-        Long creditLimit=advertiserToValidate.getCreditLimit()-transAmount;
-        if(creditLimit>0) {
+        BigDecimal creditLimit=advertiserToValidate.getCreditLimit().subtract(transAmount);
+       
+        if(creditLimit.compareTo(new BigDecimal("0.00"))==1) {
         	return true;
         }else {
         	return false;
@@ -133,6 +135,35 @@ public class AdvertiserServiceImpl implements AdvertiserService {
 		
 	}
 
+	
+	
+	@Override
+	@Transactional(
+            propagation = Propagation.REQUIRED,
+            readOnly = true)
+	public Advertiser deductCredit(Long id,BigDecimal amount) {
+		
+		logger.info("deduct Advertiser credit - id:{}", id);
+		
+		Advertiser deductAdvertiser = findOne(id);
+        if (deductAdvertiser == null) {
+            
+            logger.error(
+                    "Attempted to Deduct  a Advertiser credit, but the record does not exist.");
+            throw new NoResultException("Requested for Deduct credit - Advertiser not found.");
+        }
+        
+        BigDecimal currentLimit=deductAdvertiser.getCreditLimit();
+        BigDecimal updatedLimit=currentLimit.subtract(amount);
+        
+        if(updatedLimit.compareTo(new BigDecimal("0.00"))==1 || updatedLimit.compareTo(new BigDecimal("0.00"))==0 ) {
+        	deductAdvertiser.setCreditLimit(updatedLimit);
+        	advertiserRepository.update(deductAdvertiser);
+        }
+        
+        
+		return deductAdvertiser;
+	}
 	
 	
 }
